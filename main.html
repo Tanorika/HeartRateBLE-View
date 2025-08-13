@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>本地心率监测</title>
+    <style>
+        @font-face {
+            font-family: 'MyCustomFont';
+            src: url('bear.ttf') format('truetype');
+            /* 请替换为你实际的字体文件路径和格式 */
+        }
+    
+        :root {
+            --scale-factor: 1;
+        }
+    
+        html {
+            width: 100%;
+            height: 100%;
+            transform: scale(var(--scale-factor));
+            transform-origin: 0 0;
+        }
+    
+        body {
+            width: calc(100% / var(--scale-factor));
+            height: calc(100% / var(--scale-factor));
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background-color: transparent !important;
+            font-family: 'MyCustomFont', sans-serif; /* 添加自定义字体 */
+        }
+    
+        .container {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            padding: 0 1%; /* 减少左右留白 */
+            box-sizing: border-box;
+        }
+    
+        .heart-animation {
+            position: relative;
+            width: 40%; /* 稍微增大宽度 */
+            height: 60%;
+            aspect-ratio: 1/1;
+            margin-right: -5%; /* 负边距让元素更靠近 */
+        }
+    
+        .heart, .heart2, .heart3 {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+            object-fit: contain;
+        }
+    
+        .heart-info {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: flex-start;
+            width: 50%; /* 调整宽度 */
+            height: 100%;
+            margin-left: -3%; /* 负边距让文字更靠近视频 */
+        }
+    
+        #heartRate {
+            font-size: 20vh;
+            color: #EBEBEB;
+            font-weight: 800;
+            text-shadow: 3px 3px 6px #000000;
+            line-height: 1;
+            margin: 0;
+            padding: 0;
+        }
+    
+        #maxHeartRate, #minHeartRate {
+            font-size: 10vh;
+            color: #EBEBEB;
+            font-weight: 700;
+            text-shadow: 2px 2px 4px #000000;
+            line-height: 1.2;
+            margin: 5px 0;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 保持原有HTML结构不变 -->
+    <div class="container">
+        <div class="heart-animation">
+            <video class="heart" autoplay loop muted playsinline>
+                <source src="green.webm" type="video/webm">
+            </video>
+            <video class="heart2" autoplay loop muted playsinline>
+                <source src="orange.webm" type="video/webm">
+            </video>
+            <video class="heart3" autoplay loop muted playsinline>
+                <source src="red.webm" type="video/webm">
+            </video>
+        </div>
+        <div class="heart-info">
+            <div id="maxHeartRate">Max: --</div>
+            <div id="heartRate">--</div>
+            <div id="minHeartRate">Min: --</div>
+        </div>
+    </div>
+
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+    <script>
+        // 保持原有JavaScript代码不变
+        let maxHR = 0,
+            minHR = Infinity,
+            currentHR = 0;
+        const hrDisplay = document.getElementById('heartRate');
+        const maxDisplay = document.getElementById('maxHeartRate');
+        const minDisplay = document.getElementById('minHeartRate');
+        const heartRates = [];
+
+        const socket = io('http://localhost:5000');
+
+        socket.on('heart_rate', data => {
+            currentHR = data.current;
+            hrDisplay.textContent = currentHR;
+
+            maxHR = Math.max(maxHR, currentHR);
+            minHR = Math.min(minHR, currentHR);
+            maxDisplay.textContent = `Max: ${maxHR}`;
+            minDisplay.textContent = `Min: ${minHR}`;
+
+            heartRates.push(currentHR);
+            if (heartRates.length > 100) heartRates.shift();
+
+            if (heartRates.length > 10) {
+                const avg = heartRates.reduce((a, b) => a + b, 0) / heartRates.length;
+                const threshold1 = avg * 1.05;
+                const threshold2 = avg * 1.10;
+
+                const heart = document.querySelector('.heart');
+                const heart2 = document.querySelector('.heart2');
+                const heart3 = document.querySelector('.heart3');
+
+                if (currentHR >= threshold2) {
+                    setActiveHeart(heart3, [heart, heart2]);
+                } else if (currentHR >= threshold1) {
+                    setActiveHeart(heart2, [heart, heart3]);
+                } else {
+                    setActiveHeart(heart, [heart2, heart3]);
+                }
+            }
+        });
+
+        function setActiveHeart(active, inactives) {
+            active.style.opacity = '1';
+            inactives.forEach(el => el.style.opacity = '0');
+        }
+
+        document.querySelector('.heart').style.opacity = '1';
+    </script>
+</body>
+
+</html>
