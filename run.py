@@ -35,7 +35,7 @@ class HeartRateWindow(QMainWindow):
         except Exception as e:
             print(f"加载配置文件出错: {e}")
             return {
-                "device_name": "HUAWEI WATCH HR-487",
+                "device_name": "可设置config出错时默认回滚名称,设置也可",
                 "window": {
                     "x": 100,
                     "y": 100,
