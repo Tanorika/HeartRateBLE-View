@@ -16,14 +16,19 @@ pip install PyQt5 PyQtWebEngine bleak flask flask-socketio
 ```
 
 ## 使用方法
-1.克隆仓库
-2. 确保你的蓝牙心率设备已开启并可被发现
-3. 修改 `config.json` 中的 `device_name` 为你的设备名称
-4. 运行run.cmd或运行：
 
-```bash
-python run.py
-```
+1. 克隆仓库
+
+2. 确保你的蓝牙心率设备已开启并可被发现
+
+3. 修改 `config.json` 中的 `device_name` 为你的设备名称
+
+4. 运行方式：
+   - 双击运行 `run.cmd`
+   - 或者通过命令行运行：
+     ```bash
+     python run.py
+     ```
 
 ## 自定义配置
 
