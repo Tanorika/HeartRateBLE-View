@@ -32,7 +32,14 @@ pip install PyQt5 PyQtWebEngine bleak flask flask-socketio
 
 ## 自定义配置
 
-- **字体**：替换 `bear.ttf` 为你想要的字体文件，并在 `main.html` 中更新字体名称
+- **字体**：同目录下放入字体文件，并在 `main.html` 中更新字体名称
+  ```html
+  font-face {
+            font-family: 'MyCustomFont';
+            src: url('字体.ttf') format('truetype');
+            /* 请替换为你实际的字体文件路径和格式 */
+        }
+  ```
 - **窗口位置**：修改 `config.json` 中的 `window` 参数
 - **缩放比例**：调整 `config.json` 中的 `scale` 值
 
